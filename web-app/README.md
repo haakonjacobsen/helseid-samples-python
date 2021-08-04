@@ -14,7 +14,7 @@ From the `../web-app` folder:
 The app will be served at [http://localhost:3000](http://localhost:3000).
 
 ## API connection
-To recive data in the application, you need to run the [API example](https://github.com/haakonjacobsen/helseid-samples-python/tree/master/api) aswell. Follow the setup on that page to get the API up and running. 
+To receive data in the application, you need to run the [API example](https://github.com/haakonjacobsen/helseid-samples-python/tree/master/api) aswell. Follow the setup on that page to get the API up and running. 
 
 ## Register a client
 If you want to implement your own client you first need to register it at HelseID admin. Here you will get a `client_id` and you can define `scopes` for the application. For a web application, the scopes `openid` and `profile` are both required. You should also set up your `JWK public key` and other settings. You can use the a sample information for JWK in the `config.py` file, but DO NOT use this in development, you need to generate your own. 
