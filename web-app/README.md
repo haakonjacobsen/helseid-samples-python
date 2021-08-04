@@ -17,6 +17,17 @@ The app will be served at [http://localhost:3000](http://localhost:3000).
 To receive data in the application, you need to run the [API example](https://github.com/haakonjacobsen/helseid-samples-python/tree/master/api) aswell. Follow the setup on that page to get the API up and running. 
 
 ## Register a client
-If you want to implement your own client you first need to register it at HelseID admin. Here you will get a `client_id` and you can define `scopes` for the application. For a web application, the scopes `openid` and `profile` are both required. You should also set up your `JWK public key` and other settings. You can use the a sample information for JWK in the `config.py` file, but DO NOT use this in development, you need to generate your own. 
+If you want to implement your own client you first need to register it at HelseID admin. Here you will get a `client_id` and you can define `scopes` for the application. For a web application, the scopes `openid` and `profile` are both required. In the client at HelseID you would want to register `http://localhost:3000/callback` in the `Redirect URIs` and `http://localhost:3000` as `Post logout redirects URIs`. In `config.py` you need to change the `CLIENT_ID` to the one you recieved from HelseID admin, and change the `PRIVATE_KEY` and `PUBLIC_KEY` to your own key pair. You can use the sample key pair for JWT in the `config.py` file for testing purposes. DO NOT use this in development. Se next section on how to genereate your own key pair.
 
-In the client at HelseID you would want to register `http://localhost:3000/callback` in the `Redirect URIs` and `http://localhost:3000` as `Post logout redirects URIs`. In the application you need to change the `CLIENT_ID` to the one you recieved from HelseID admin, and change the `PRIVATE_KEY` and `PUBLIC_KEY` to 
+## Generate key pair for JWT
+There are lots of ways to generate a key pair for JWK. You can generate one at [mkjwk.org](https://mkjwk.org/).
+
+1. Choose a Key Size >= 2048
+2. Key Use = Signature
+3. Algorithm = PS256 (recommended) or RS256 (not recommended)
+4. Key ID = SHA-256
+5. Show X.509 = NO
+
+Copy the Public and Private Keypair and paste is as the value of PRIVATE_KEY in `config.py`.
+Copy the Public Key and paste is as the value of PUBLIC_KEY in `config.py`.
+Register the Public Key in your clients client secrets in HelseID Admin as a JSON Web Key.
