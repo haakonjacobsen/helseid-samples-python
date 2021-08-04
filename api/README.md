@@ -1,4 +1,4 @@
-## HelseID Python (Flask RESTful) sample for protecting an API
+## Python (Flask RESTful) sample for protecting an API with HelseID
 Explaintion
 
 ## Running the API
