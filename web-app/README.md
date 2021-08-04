@@ -26,8 +26,7 @@ There are lots of ways to generate a key pair for JWK. You can generate one at [
 2. Key Use = Signature
 3. Algorithm = PS256 (recommended) or RS256 (not recommended)
 4. Key ID = SHA-256
-5. Show X.509 = NO
-
-Copy the Public and Private Keypair and paste is as the value of PRIVATE_KEY in `config.py`.
-Copy the Public Key and paste is as the value of PUBLIC_KEY in `config.py`.
-Register the Public Key in your clients client secrets in HelseID Admin as a JSON Web Key.
+5. Show X.509 = NO and click genrate
+6. Copy the Public and Private Keypair and paste is as the value of PRIVATE_KEY in `config.py`.
+7. Copy the Public Key and paste is as the value of PUBLIC_KEY in `config.py`.
+8. Register the Public Key in your clients client secrets in HelseID Admin as a JSON Web Key.
