@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="/public/app.css" rel="stylesheet">
+    </head>
+    <body>
+        <header>
+            <h6 class="center-vert-absol">HelseID web example using Python</h6>
+            <img id="lang-logo" class="abs-right center-vert-absol" src="public/Python-logo.svg" alt="HelseID logo"/>
+        </header>
+        <div class="container flex-column-center">
+            <div class="dash-part">
+                <div class="greet info-box dash-item">
+                    <h2>Welcome <span style="color: blue;">{{userinfo['name']}}</span>, you are now logged in with HelseID</h2>
+                </div>
+                <div class="profile info-box dash-item">
+                    <img id="profile-icon" src="public/Profile-logo.svg" alt="HelseID logo"/>
+                    <h4 class="profile-title">Profile info</h4>
+                    <ul class="profile-info">
+                        <li><span class="profile-item">First name: </span>{{userinfo['given_name']}}</li>
+                        <li><span class="profile-item">Last name: </span>{{userinfo['family_name']}}</li>
+                        <li><span class="profile-item">Health personnel: </span>
+                            {% if 'helseid://claims/hpr/hpr_number' in userinfo %}
+                                Yes
+                            {% else %}
+                                No
+                            {% endif %}
+                        </li>
+                        <li>
+                            <span class="profile-item">Security level: </span>
+                            {{userinfo['helseid://claims/identity/security_level']}}
+                        </li>
+                        <li><span class="profile-item">ID-provider: </span>{{userinfo['idp']}}</li>
+                    </ul>
+                </div>
+            </div>
+            <!--API PART-->
+            <div class="dash-part api-panel">
+                <a class="api-btn btn flex-column-center" href="/get_data">
+                    <h5>Get data</h5>
+                    <img src="public/Arrow.svg" alt="HelseID logo"/>
+                </a>
+                <pre class="data-box">{{userinfo_pretty}}</pre>
+            </div>
+            <!--API PART END-->
+            <div class="dash-part">
+                <a class="dash-item btn helse-id-btn flex-column-center" href="/logout">Log out</a>
+            </div>
+        </div>
+    </body>
+</html>
