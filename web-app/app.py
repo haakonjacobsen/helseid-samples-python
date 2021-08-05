@@ -1,5 +1,4 @@
 import json
-import base64
 import requests
 import pkce
 import time
@@ -31,9 +30,7 @@ oauth.register(
     client_kwargs={'scope': SCOPES}
 )
 helseid_client = oauth.create_client('helseid')
-
-# Cache metadata from HelseID
-helseid_metadata = json.loads(requests.get(HELSEID_METADATA_URL).text)
+helseid_metadata = helseid_client.load_server_metadata()
 
 
 def create_jwt_header():
@@ -68,20 +65,6 @@ def create_request_object(payload):
     header = create_jwt_header()
     encoded = jwt.encode(header, payload, PRIVATE_KEY)
     return encoded
-
-
-def b64_decode_jwt(token):
-    """Base64 decodes a jwt in UTF-8 format. Returns three values:
-    header, payload and signature"""
-    token = token.split('.')
-    if len(token) != 3:
-        raise ValueError(f'Length of jwt should be 3, but was {len(token)}')
-    for i in range(0, 2):
-        # Pad header and payload for b64decoding
-        token[i] = token[i] + ('=' * (len(token[i]) % 4))
-    header = json.loads(base64.b64decode(token[0]).decode('UTF-8'))
-    payload = json.loads(base64.b64decode(token[1]).decode('UTF-8'))
-    return header, payload
 
 
 def requires_auth(f):
