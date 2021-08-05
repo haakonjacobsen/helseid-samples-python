@@ -21,8 +21,6 @@ Run application (Mac/Linux):
 pyhon3 app.py
 ```
 
-2. Run `python3 app.py` on Mac/Linux or `py app.py` on Windows (assuming this is how your python 3 is configured).
-
 ## API connection
 To receive data in the application, you need to run the [API example](https://github.com/haakonjacobsen/helseid-samples-python/tree/master/api) aswell. Follow the setup on that page to get the API up and running. 
 
