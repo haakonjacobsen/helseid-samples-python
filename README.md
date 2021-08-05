@@ -1,5 +1,5 @@
 # HelseID Samples in Python
-HelseID is a national authentication service for the health sector in Norway. These samples are targeted at technical personnel such as application architects and developers on how to implement HelseID in Python applications. The samples consists of 3 applications.
+HelseID is a national authentication service for the health sector in Norway. These samples are targeted at technical personnel such as application architects and developers and demonstrates how to implement HelseID in Python applications. The samples consists of 3 applications.
 
 ## [Web App](web-app)
 The web app demonstrates the authorization code flow (openID connect). It uses the id token to verify the identity of the user. It also gets an access token, which it uses to retrieve a resource from the [API](api).
