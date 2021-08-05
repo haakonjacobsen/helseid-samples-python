@@ -1,6 +1,5 @@
 import json
 import requests
-import pkce
 import time
 
 from functools import wraps
@@ -11,7 +10,7 @@ from authlib.jose import jwt
 from urllib.parse import urlencode
 from uuid import uuid4
 
-from config import CLIENT_ID, HELSEID_METADATA_URL, SCOPES, PRIVATE_KEY
+from config import CLIENT_ID, HELSEID_METADATA_URL, SCOPES, API_BASE_URL, PRIVATE_KEY
 
 # ATTENTION:
 # THIS EXAMPLE USES HTTP FOR SIMPLICITY
@@ -21,19 +20,22 @@ app = Flask(__name__, static_url_path='/public', static_folder='./public')
 app.secret_key = 'ThisIsTheSecretKey'
 app.debug = True
 
-# Create an OAuth (OIDC) client with HelseID information
+# Create an OAuth (OIDC) client with HelseID information.
 oauth = OAuth(app)
 oauth.register(
     name='helseid',
     client_id=CLIENT_ID,
     server_metadata_url=HELSEID_METADATA_URL,
-    client_kwargs={'scope': SCOPES}
+    client_kwargs={'scope': SCOPES},
+    api_base_url=API_BASE_URL,
+    code_challenge_method='S256'
 )
 helseid_client = oauth.create_client('helseid')
 helseid_metadata = helseid_client.load_server_metadata()
 
 
 def create_jwt_header():
+    """Creates a JWT header based on the clients private key"""
     header = {
         'alg': PRIVATE_KEY['alg'],
         'kid': PRIVATE_KEY['kid']
@@ -41,8 +43,10 @@ def create_jwt_header():
     return header
 
 
-def create_client_assertion():
-    """Creates and returns a signed JTW for client assertion"""
+def create_jwt_credentials(audience):
+    """Creates and returns a signed JWT containing client information
+    Args:
+        audience (str): The audience of the JWT"""
     now = int(time.time())
     payload = {
         'sub': CLIENT_ID,
@@ -51,20 +55,20 @@ def create_client_assertion():
         'nbf': now,
         'exp': now + 60,
         'iss': CLIENT_ID,
-        'aud': helseid_metadata['token_endpoint']
+        'aud': audience
     }
     header = create_jwt_header()
     encoded = jwt.encode(header, payload, PRIVATE_KEY)
     return encoded
 
 
-def create_request_object(payload):
-    """Creates and returns a request object
-    Args:
-        payload (dict): The payload to use in the JWT"""
-    header = create_jwt_header()
-    encoded = jwt.encode(header, payload, PRIVATE_KEY)
-    return encoded
+def create_client_assertion():
+    return create_jwt_credentials(helseid_metadata['token_endpoint'])
+
+
+def create_request_object():
+    return create_jwt_credentials(helseid_metadata['issuer'])
+
 
 
 def requires_auth(f):
@@ -85,23 +89,8 @@ def home():
 
 @app.route('/login-helseid')
 def login_helseid():
-    # Generate code verifier- and challenge with PKCE. Save verifier.
-    code_verifier, code_challenge = pkce.generate_pkce_pair()
-    session['code_verifier'] = code_verifier
-
     # Generate a JWT request_object for passing parameters
-    now = int(time.time())
-    request_object_payload = {
-        'client_id': CLIENT_ID,
-        'iss': CLIENT_ID,
-        'aud': helseid_metadata['issuer'],
-        'code_challenge': code_challenge,
-        'code_challenge_method': 'S256',
-        'jti': uuid4().hex,
-        'nbf': now,
-        'exp': now + 60
-    }
-    request_object = create_request_object(request_object_payload)
+    request_object = create_request_object()
 
     # Redirect to HelseID with callback url and request object as parameter
     params = {
@@ -115,7 +104,6 @@ def login_helseid():
 def callback():
     """The endpoint for exchanging the authorization code with tokens"""
     params = {
-        'code_verifier': session['code_verifier'],
         'client_assertion': create_client_assertion(),
         'client_assertion_type': 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
     }

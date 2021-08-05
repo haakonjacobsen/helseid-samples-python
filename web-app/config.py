@@ -1,6 +1,7 @@
 CLIENT_ID = "31ba22e2-14c3-4dcc-8141-fccdda6ae6d1"
 HELSEID_METADATA_URL = 'https://helseid-sts.utvikling.nhn.no/.well-known/openid-configuration'
 SCOPES = 'openid profile norsk-helsenett:python-sample-api/read'
+API_BASE_URL = 'http://localhost:5000/api/'
 PRIVATE_KEY = {
     "p": "8iFO18ITr_5Lq88XXwg2W-KmVIvbWv1tGI4_hw1Hn_wxtv_IW5jRWlwGCsJzeNikcaUrbxLTe8nS7ZNbKmgmePMT7Y9SXw758sgd27sB8GmBaaZfQbFoN1peiQzoNmq5ZA9V3-HAcfXGdbJJK50S-b4eGltoHjifFrNL-m_eMPM",
     "kty": "RSA",
