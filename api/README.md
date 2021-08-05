@@ -6,11 +6,21 @@ To run the API, make sure you have `python` and `pip` installed (using a virtual
 
 From the `../api` folder:
 
-1. Run `pip install -r requirements.txt` to install the dependencies. 
+Install dependencies:
+```
+pip install -r requirements.txt
+```
 
-2. Run `python3 resource_server.py` on Mac/Linux or `py resource_server.py` on Windows (assuming this is how your python 3 is configured).
+Run application (Windows):
+```
+py resource_server.py
+```
+Run application (Mac/Linux):
+```
+python3 resource_server.py
+```
 
-The API will be served at 
+The API will be served at http://localhost:5000/api/
 
 ## Endpoints
 The API has 1 endpoint which returns mock data of patient information in JSON format:
