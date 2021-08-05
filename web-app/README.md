@@ -1,4 +1,4 @@
-# HelseID Python Web App Sample
+# HelseID sample web app in Python
 
 This sample demonstrates how to add authentication to a Python web app (Flask) using the OAuth 2.0 authorization code flow with HelseID. The application runs out of the box and you can implement your own client information later.
 
@@ -7,9 +7,19 @@ To run the sample, make sure you have `python` and `pip` installed (using a virt
 
 From the `../web-app` folder:
 
-1. Run `pip install -r requirements.txt` to install the dependencies. 
+Install dependencies:
+```
+pip install -r requirements.txt
+```
 
-2. Run `python3 app.py` on Mac/Linux or `py app.py` on Windows (assuming this is how your python 3 is configured).
+Run application (Windows):
+```
+py app.py
+```
+Run application (Mac/Linux):
+```
+pyhon3 app.py
+```
 
 The app will be served at [http://localhost:3000](http://localhost:3000).
 
