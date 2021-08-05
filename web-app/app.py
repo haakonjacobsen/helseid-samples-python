@@ -12,7 +12,7 @@ from authlib.jose import jwt
 from urllib.parse import urlencode
 from uuid import uuid4
 
-from config import CLIENT_ID, HELSEID_METADATA_URL, PRIVATE_KEY
+from config import CLIENT_ID, HELSEID_METADATA_URL, SCOPES, PRIVATE_KEY
 
 # ATTENTION:
 # THIS EXAMPLE USES HTTP FOR SIMPLICITY
@@ -22,17 +22,18 @@ app = Flask(__name__, static_url_path='/public', static_folder='./public')
 app.secret_key = 'ThisIsTheSecretKey'
 app.debug = True
 
+# Create an OAuth (OIDC) client with HelseID information
 oauth = OAuth(app)
+oauth.register(
+    name='helseid',
+    client_id=CLIENT_ID,
+    server_metadata_url=HELSEID_METADATA_URL,
+    client_kwargs={'scope': SCOPES}
+)
+helseid_client = oauth.create_client('helseid')
 
 # Cache metadata from HelseID
 helseid_metadata = json.loads(requests.get(HELSEID_METADATA_URL).text)
-
-# Create an OAuth client with HelseID information
-helseid = oauth.register(
-    name='helseid',
-    client_id=CLIENT_ID,
-    server_metadata_url=HELSEID_METADATA_URL
-)
 
 
 def create_jwt_header():
@@ -87,10 +88,8 @@ def requires_auth(f):
     """Decide if user is logged in or should be logged out"""
     @wraps(f)
     def decorated(*args, **kwargs):
-        if 'id_token' not in session or 'end_time' not in session:
+        if 'id_token' not in session:
             return redirect('/')
-        if session['end_time'] <= int(time.time()):
-            return redirect(url_for('logout'))
         return f(*args, **kwargs)
     return decorated
 
@@ -103,23 +102,16 @@ def home():
 
 @app.route('/login-helseid')
 def login_helseid():
-    helseid_client = oauth.create_client('helseid')
-
     # Generate code verifier- and challenge with PKCE. Save verifier.
     code_verifier, code_challenge = pkce.generate_pkce_pair()
     session['code_verifier'] = code_verifier
 
-    # Generate nonce
-    session['nonce'] = uuid4().hex
-
-    # Generate a JWT request_object to for passing parameters
+    # Generate a JWT request_object for passing parameters
     now = int(time.time())
     request_object_payload = {
-        'scope': 'openid profile norsk-helsenett:python-sample-api/read',
         'client_id': CLIENT_ID,
         'iss': CLIENT_ID,
         'aud': helseid_metadata['issuer'],
-        'nonce': session['nonce'],
         'code_challenge': code_challenge,
         'code_challenge_method': 'S256',
         'jti': uuid4().hex,
@@ -128,50 +120,31 @@ def login_helseid():
     }
     request_object = create_request_object(request_object_payload)
 
+    # Redirect to HelseID with callback url and request object as parameter
     params = {
         'request': request_object
     }
     callback_url = url_for('callback', _external=True)
-
-    # Redirect to HelseID with callback url and request object as parameter
     return helseid_client.authorize_redirect(callback_url, **params)
 
 
 @app.route('/callback')
 def callback():
-    """The endpoint for exchanging the authorization code with access token"""
-    helseid_client = oauth.create_client('helseid')
-
-    # Exchange auth code with access- and ID-token
+    """The endpoint for exchanging the authorization code with tokens"""
     params = {
         'code_verifier': session['code_verifier'],
         'client_assertion': create_client_assertion(),
         'client_assertion_type': 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
     }
     response = helseid_client.authorize_access_token(**params)
-
-    # Extract ID and access token
-    id_token = response['id_token']
+    # Validate ID-token
+    id_token_payload = helseid_client.parse_id_token(response, leeway=10)
+    # Extract Access token
     access_token = response['access_token']
-
-    # Decode ID token
-    _header, payload = b64_decode_jwt(id_token)
-
-    # Validate issuer
-    if payload['iss'] != helseid_metadata['issuer']:
-        print('Issuer did not match metadata')
-        return redirect(url_for('home'))
-
-    # Validate nonce
-    if payload['nonce'] != session['nonce']:
-        print('Nonce did not match')
-        return redirect(url_for('home'))
-
     # Save information to session
-    session['end_time'] = payload['exp']
-    session['id_token'] = id_token
+    session['id_token'] = response['id_token']
     session['access_token'] = access_token
-    session['jwt_payload'] = payload
+    session['payload'] = id_token_payload
     session['api_data'] = {'Data': 'No data has been loaded yet'}
 
     return redirect('/dashboard')
@@ -191,7 +164,7 @@ def logout():
 @requires_auth
 def dashboard():
     return render_template('dashboard.html',
-                           userinfo=session['jwt_payload'],
+                           userinfo=session['payload'],
                            userinfo_pretty=json.dumps(session['api_data'], indent=4))
 
 
@@ -203,9 +176,9 @@ def get_api_data():
         session['api_data'] = json.loads(requests.get(
                                 'http://localhost:5000/api/patients',
                                 headers=header).text)
-        return redirect('/dashboard')
-    except Exception:
+    except Exception as e:
         session['api_data'] = 'Error: Not able to parse response from API.'
+    return redirect('/dashboard')
 
 
 @app.errorhandler(Exception)
