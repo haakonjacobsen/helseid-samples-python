@@ -4,7 +4,7 @@ HelseID is a national authentication service for the health sector in Norway. Th
 ## [Web App](web-app)
 The web app demonstrates the authorization code flow (openID connect). It uses the id token to verify the identity of the user. It also gets an access token, which it uses to retrieve a resource from the [API](api).
 
-## [Machine to machine](client-crentials-jwt)
+## [Machine to machine](m2m)
 The m2m app uses the client credentials flow (OAuth 2.0) to get an access token, and uses the access token retrieve a resource from the [API](api).
 
 ## [API](api)
