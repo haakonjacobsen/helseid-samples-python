@@ -5,9 +5,21 @@ This sample demonstrates how to add HelseID authorization to a Python machine to
 ## Running the App
 To run the sample, make sure you have `python` and `pip` installed (using a virtual environment is recommended).
 
-From the `../client-credentials-jwt` folder:
+From the `../m2m-app` folder:
 
-1. Run `pip install -r requirements.txt` to install the dependencies. 
+Install dependencies:
+```
+pip install -r requirements.txt
+```
+
+Run application (Windows):
+```
+py app.py
+```
+Run application (Mac/Linux):
+```
+pyhon3 app.py
+```
 
 2. Run `python3 app.py` on Mac/Linux or `py app.py` on Windows (assuming this is how your python 3 is configured).
 
