@@ -18,7 +18,7 @@ py app.py
 ```
 Run application (Mac/Linux):
 ```
-pyhon3 app.py
+python3 app.py
 ```
 
 ## API connection
