@@ -84,6 +84,8 @@ def requires_auth(f):
 # ---- Routes ----
 @app.route('/')
 def home():
+    if 'id_token' in session:
+        return redirect('/dashboard')
     return render_template('home.html')
 
 
