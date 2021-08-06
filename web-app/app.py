@@ -149,8 +149,8 @@ def get_api_data():
         session['api_data'] = json.loads(requests.get(
                                 'http://localhost:5000/api/patients',
                                 headers=header).text)
-    except Exception:
-        session['api_data'] = 'Error: Not able to parse response from API.'
+    except Exception as ex:
+        session['api_data'] = { ex.__class__.__name__: str(ex.args)}
     return redirect('/dashboard')
 
 
